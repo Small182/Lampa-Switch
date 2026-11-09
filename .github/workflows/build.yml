@@ -18,6 +18,11 @@ jobs:
           cp scripts/customize.py upstream/customize.py
           cd upstream
           python3 customize.py
+      - name: Create Lampa icon
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pil
+          python3 scripts/make_icon.py
       - name: Check out LKL
         run: |
           mkdir -p work

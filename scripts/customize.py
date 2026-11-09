@@ -24,7 +24,8 @@ replace("gx/host_nx.c", '-A225,46,1150,80 /usr/lib/chromium/chromium', '-F -A0,0
 
 # The launcher still needs its normal environment setup, but should never
 # display its home page; hand over to the browser immediately after settings.
-replace("gx/launcher/main.c", "\thidInitializeTouchScreen();\n\tload_settings();\n", "\thidInitializeTouchScreen();\n\tload_settings();\n\tresult = launch(\"http://lampa.mx/\", 0) ? QUIT : GO;\n\tgoto out;\n")
+replace("gx/launcher/main.c", "\tframebufferMakeLinear(&fb);\n", "\tframebufferMakeLinear(&fb);\n\tfbuf = framebufferBegin(&fb, &fstride);\n\tdraw_starting();\n\tframebufferEnd(&fb);\n\tresult = launch(\"http://lampa.mx/\", 0) ? QUIT : GO;\n\tframebufferClose(&fb);\n\tgoto out;\n")
+replace("gx/launcher/main.c", '"Starting Chromium..."', '"Loading Lampa..."')
 
 # Suppress the text framebuffer during successful startup. Preserve file logs.
 # Keep fatal address-space errors visible (they happen before the log opens).
