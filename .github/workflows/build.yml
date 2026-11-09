@@ -45,6 +45,8 @@ jobs:
             devkitpro/devkita64:latest bash -euc '
               apt-get update
               apt-get install -y flex bison bc libelf-dev cpio rsync build-essential
+              git config --global --add safe.directory /work/linux
+              git config --global --add safe.directory /work/linux/.git
               bash /project/gx/build-nx.sh
             '
       - name: Verify artifact
