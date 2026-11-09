@@ -34,9 +34,13 @@ jobs:
           docker run --rm --privileged \
             -v "$PWD/upstream:/project" -v "$PWD/work:/work" \
             lampa-debian bash -euc '
+              apt-get update
+              apt-get install -y --no-install-recommends chromium:arm64
               bash /project/gx/build-lkl.sh
               NO_TESTS=1 bash /project/gx/build-pc.sh
               NO_TESTS=1 bash /project/gx/build-chromium.sh
+              test -s /work/gx-out/profile.ext4.gz
+              test -s /work/gx-out/chromium-full-switch.ext4
             '
       - name: Build Switch homebrew
         run: |
