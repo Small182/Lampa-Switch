@@ -4,7 +4,7 @@ Experimental standalone Lampa launcher based on [Chromium NX](https://github.com
 
 Target: open `http://lampa.mx/` in fullscreen, with no startup text console. Diagnostic output remains on the SD card.
 
-The build generates a dark-orange Lampa icon for the Switch menu and shows it on the loading screen while handing control to Chromium. These are original, project-specific graphics.
+The build uses the supplied original black-and-white Lampa icon (`assets/lampa-original.png`) for the Switch menu and shows it on the loading screen while handing control to Chromium.
 
 ## Build
 
