@@ -1,0 +1,51 @@
+name: Build Lampa Switch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out Chromium NX
+        run: git clone --depth 1 https://github.com/shodowlo/chromium-nx.git upstream
+      - name: Apply Lampa customization
+        run: |
+          cp scripts/customize.py upstream/customize.py
+          cd upstream
+          python3 customize.py
+      - name: Check out LKL
+        run: |
+          mkdir -p work
+          git clone --depth 1 https://github.com/lkl/linux.git work/linux
+      - name: Prepare Debian build container
+        run: docker build -t lampa-debian upstream/gx/docker
+      - name: Build Linux guest and Chromium image
+        run: |
+          docker run --rm --privileged \
+            -v "$PWD/upstream:/project" -v "$PWD/work:/work" \
+            lampa-debian bash -euc '
+              bash /project/gx/build-lkl.sh
+              NO_TESTS=1 bash /project/gx/build-pc.sh
+              bash /project/gx/build-chromium.sh
+            '
+      - name: Build Switch homebrew
+        run: |
+          docker run --rm \
+            -v "$PWD/upstream:/project" -v "$PWD/work:/work" \
+            devkitpro/devkita64:latest bash -euc '
+              apt-get update
+              apt-get install -y flex bison bc libelf-dev cpio rsync build-essential
+              bash /project/gx/build-nx.sh
+            '
+      - name: Verify artifact
+        run: |
+          test -s upstream/gx/dist-nx/switch/lampa-switch/Lampa.nro
+          test -s upstream/gx/dist-nx/switch/lampa-switch/chromium-full.ext4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lampa-Switch
+          path: upstream/gx/dist-nx/switch/lampa-switch/
+          if-no-files-found: error
